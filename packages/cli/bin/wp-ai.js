@@ -70,6 +70,7 @@ Commands:
          [--name "..."] [--url https://...]
   site init-local <id>              Scaffold sites/<id> from template (no remote)
   playground <id> [--port N]        Run Playground with that site's theme mounted
+  site pull <id>                    Public snapshot of live WordPress.com/site into import/
   which                             Print tools monorepo root
 
 Examples:
@@ -298,6 +299,86 @@ async function cmdPlayground(reg, id, flags) {
   );
 }
 
+
+async function cmdSitePull(reg, id) {
+  if (!id) die("usage: wp-ai site pull <id>");
+  const site = reg.sites?.[id];
+  if (!site) die(`unknown site "${id}"`);
+  const abs = sitePath(id, reg);
+  const url = (site.url || "").replace(/\/$/, "");
+  if (!url) die(`site ${id} has no url in registry`);
+
+  const snap = join(abs, "import/snapshots");
+  const mediaDir = join(abs, "import/media");
+  mkdirSync(snap, { recursive: true });
+  mkdirSync(mediaDir, { recursive: true });
+
+  console.log(`Pulling public snapshot of ${url} → ${join(abs, "import/")}`);
+
+  const write = (name, body) => writeFileSync(join(snap, name), body);
+
+  const fetchText = async (u) => {
+    const res = await fetch(u, { redirect: "follow", headers: { "user-agent": "wordpress-ai-tools/0.1" } });
+    if (!res.ok) throw new Error(`${u} → ${res.status}`);
+    return await res.text();
+  };
+  const fetchJson = async (u) => JSON.parse(await fetchText(u));
+
+  // Homepage HTML
+  const html = await fetchText(url + "/");
+  write("homepage.html", html);
+
+  // WP.com REST site meta (works for Simple sites)
+  let meta = null;
+  for (const host of [new URL(url).hostname, url.replace(/^https?:\/\//, "")]) {
+    try {
+      meta = await fetchJson(`https://public-api.wordpress.com/rest/v1.1/sites/${host}`);
+      break;
+    } catch {
+      /* try next */
+    }
+  }
+  if (meta) write("site-meta.json", JSON.stringify(meta, null, 2) + "\n");
+
+  const themeMatch = html.match(/wptheme&quot;:&quot;([^&]+)/);
+  const theme = themeMatch ? themeMatch[1].replace(/\\\//g, "/") : "unknown";
+  const bodyMatch = html.match(/body class="([^"]+)"/);
+  const summary = {
+    url,
+    pulled_at: new Date().toISOString(),
+    wpcom_site_id: meta?.ID ?? null,
+    platform: meta?.is_wpcom_atomic ? "wordpress.com-atomic" : "wordpress.com-or-self-hosted",
+    is_atomic: Boolean(meta?.is_wpcom_atomic),
+    theme_detected: theme,
+    body_classes: bodyMatch?.[1] || "",
+    name: meta?.name || null,
+  };
+  write("site-summary.json", JSON.stringify(summary, null, 2) + "\n");
+
+  // Media URLs from homepage
+  const imgs = [...html.matchAll(/https?:\/\/[^"'\\s>]+\.(?:png|jpe?g|webp|gif)/gi)].map((m) => m[0].split("?")[0]);
+  const uniq = [...new Set(imgs)].filter((u) => !/pixel\.wp\.com|s0\.wp\.com\/i\//.test(u));
+  write("media-urls.json", JSON.stringify(uniq, null, 2) + "\n");
+
+  for (const imgUrl of uniq.slice(0, 40)) {
+    try {
+      const res = await fetch(imgUrl, { headers: { "user-agent": "wordpress-ai-tools/0.1" } });
+      if (!res.ok) continue;
+      const name = imgUrl.split("/").pop() || "image.bin";
+      const buf = Buffer.from(await res.arrayBuffer());
+      writeFileSync(join(mediaDir, name), buf);
+      console.log(`  media ${name} (${buf.length} bytes)`);
+    } catch (e) {
+      console.warn(`  media skip ${imgUrl}: ${e.message}`);
+    }
+  }
+
+  console.log("\nDone. See import/snapshots/ and import/IMPORT.md (if present).");
+  console.log("For full content export: WordPress.com → Tools → Export → save WXR under import/wxr/");
+  console.log(JSON.stringify(summary, null, 2));
+}
+
+
 async function main() {
   const argv = process.argv.slice(2);
   if (!argv.length || argv[0] === "-h" || argv[0] === "--help" || argv[0] === "help") {
@@ -323,6 +404,7 @@ async function main() {
     }
     if (sub === "add") return cmdSiteAdd(reg, flags);
     if (sub === "init-local") return cmdSiteInitLocal(reg, positional[0] || flags.id);
+    if (sub === "pull") return cmdSitePull(reg, positional[0] || flags.id);
     die(`unknown site subcommand "${sub}"`);
   }
 
