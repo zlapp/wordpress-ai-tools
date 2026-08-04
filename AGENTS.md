@@ -57,15 +57,15 @@ See each site’s `site.yaml` → `deploy.method`.
 
 ## Design System
 
-Always read `DESIGN.md` before making any visual or UI decisions.
+Always read `sites/<id>/DESIGN.md` before making any visual or UI decisions for that site.
 All font choices, colors, spacing, and aesthetic direction are defined there
 ([google-labs-code/design.md](https://github.com/google-labs-code/design.md) format).
 Default brand is **YC Formidable** (modeled on [ycombinator.com](https://www.ycombinator.com/)).
 
 - Do not deviate without explicit user approval.
-- Per-site overrides: `sites/<id>/DESIGN.md` wins for that site; root `DESIGN.md` is the fallback.
-- In QA mode, flag any code that doesn't match the active DESIGN.md.
-- Optional lint: `npx @google/design.md lint DESIGN.md`
+- Design systems: `sites/<id>/DESIGN.md` is the source of truth for that site (not monorepo root).
+- In QA mode, flag any code that doesn't match `sites/<id>/DESIGN.md`.
+- Optional lint: `npx @google/design.md lint sites/<id>/DESIGN.md`
 
 ## Skills to load first
 
