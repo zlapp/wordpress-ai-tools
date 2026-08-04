@@ -283,20 +283,23 @@ async function cmdPlayground(reg, id, flags) {
   console.log(`  theme → ${themeDir}`);
   console.log(`  http://127.0.0.1:${port}\n`);
 
-  await run(
-    "npx",
-    [
-      "-y",
-      "@wp-playground/cli@latest",
-      "server",
-      "--port",
-      port,
-      "--mount",
-      `${themeDir}:/wordpress/wp-content/themes/${id}`,
-      "--login",
-    ],
-    { cwd: ROOT }
-  );
+  const blueprint = join(abs, "blueprints/local.json");
+  const args = [
+    "-y",
+    "@wp-playground/cli@latest",
+    "server",
+    "--port",
+    port,
+    "--mount",
+    `${themeDir}:/wordpress/wp-content/themes/${id}`,
+    "--login",
+  ];
+  if (existsSync(blueprint)) {
+    args.push("--blueprint", blueprint);
+    console.log(`  blueprint → ${blueprint}`);
+  }
+
+  await run("npx", args, { cwd: ROOT });
 }
 
 
