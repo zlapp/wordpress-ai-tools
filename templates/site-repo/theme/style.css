@@ -1,0 +1,13 @@
+/*
+Theme Name: {{SITE_NAME}}
+Theme URI: {{SITE_URL}}
+Author: Site owner
+Description: Block theme for {{SITE_NAME}} — edited via wordpress-ai-tools.
+Version: 0.1.0
+Requires at least: 6.4
+Tested up to: 6.8
+Requires PHP: 7.4
+Text Domain: {{SITE_ID}}
+*/
+
+/* Prefer theme.json for design tokens; keep this file for theme header only. */

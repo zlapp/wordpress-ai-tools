@@ -1,0 +1,24 @@
+{
+  "$schema": "https://playground.wordpress.net/blueprint-schema.json",
+  "landingPage": "/",
+  "login": true,
+  "steps": [
+    {
+      "step": "installTheme",
+      "themeData": {
+        "resource": "vfs",
+        "path": "/wordpress/wp-content/themes/{{SITE_ID}}"
+      },
+      "options": {
+        "activate": true
+      }
+    },
+    {
+      "step": "setSiteOptions",
+      "options": {
+        "blogname": "{{SITE_NAME}}",
+        "blogdescription": "Edited with wordpress-ai-tools"
+      }
+    }
+  ]
+}

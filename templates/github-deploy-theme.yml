@@ -1,0 +1,27 @@
+# Copy into a site repo as .github/workflows/deploy-theme.yml
+# Deploys theme/ to WordPress via SFTP on push to main.
+
+name: Deploy theme
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "theme/**"
+      - ".github/workflows/deploy-theme.yml"
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: SFTP deploy theme
+        uses: wlixcc/SFTP-Deploy-Action@v1.2.4
+        with:
+          server: ${{ secrets.SFTP_HOST }}
+          username: ${{ secrets.SFTP_USER }}
+          password: ${{ secrets.SFTP_PASS }}
+          local_path: ./theme/*
+          remote_path: ${{ vars.REMOTE_THEME_PATH || '/wp-content/themes/SITE_ID/' }}
+          sftp_only: true

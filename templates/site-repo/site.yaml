@@ -1,0 +1,45 @@
+# Per-site config (lives in the site submodule, not only the tools monorepo).
+# Tools registry may mirror non-secret fields from sites.registry.yaml.
+
+id: "{{SITE_ID}}"
+name: "{{SITE_NAME}}"
+url: "{{SITE_URL}}"
+
+theme:
+  path: theme
+  # Activated theme slug on the WordPress install
+  stylesheet: "{{SITE_ID}}"
+
+deploy:
+  # sftp | github-action | manual | none
+  method: sftp
+  remote_theme_path: /wp-content/themes/{{SITE_ID}}
+  # Secret names only (store values in GitHub Actions / env)
+  secrets:
+    - SFTP_HOST
+    - SFTP_USER
+    - SFTP_PASS
+
+content:
+  # rest | mcp-adapter | none
+  method: rest
+  rest_base: "{{SITE_URL}}/wp-json"
+  env:
+    username: "{{SITE_ID}}_WP_USER"
+    app_password: "{{SITE_ID}}_WP_APP_PASSWORD"
+  mcp:
+    enabled: false
+    endpoint: "{{SITE_URL}}/wp-json/mcp/mcp-adapter-default-server"
+
+playground:
+  blueprint: blueprints/local.json
+
+# What agents should change in this repo
+scope:
+  - theme
+  - patterns
+  - blueprints
+
+notes: |
+  This repository is one WordPress site package.
+  The parent monorepo (wordpress-ai-tools) mounts it as sites/{{SITE_ID}}.

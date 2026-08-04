@@ -1,0 +1,42 @@
+{
+  "version": 1,
+  "defaults": {
+    "theme_subdir": "theme",
+    "blueprint": "blueprints/local.json"
+  },
+  "sites": {
+    "lappzvi": {
+      "name": "Zvi Lapp personal",
+      "path": "sites/lappzvi",
+      "url": "https://lappzvi.com",
+      "admin_url": "https://wordpress.com/home/lappzvi.com",
+      "deploy": {
+        "method": "sftp",
+        "secrets": [
+          "SFTP_HOST",
+          "SFTP_USER",
+          "SFTP_PASS"
+        ],
+        "remote_theme_path": "/wp-content/themes/lappzvi"
+      },
+      "content": {
+        "method": "rest",
+        "rest_base": "https://lappzvi.com/wp-json",
+        "env": {
+          "username": "LAPPZVI_WP_USER",
+          "app_password": "LAPPZVI_WP_APP_PASSWORD"
+        },
+        "mcp": {
+          "enabled": false
+        }
+      },
+      "scope": [
+        "theme",
+        "patterns",
+        "blueprints"
+      ],
+      "notes": "Submodule: github.com/zlapp/lappzvi-wp — theme + site.yaml. Content via REST env LAPPZVI_WP_*.",
+      "repo": "https://github.com/zlapp/lappzvi-wp"
+    }
+  }
+}

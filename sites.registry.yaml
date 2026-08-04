@@ -1,0 +1,5 @@
+# Human-oriented mirror of the registry.
+# Source of truth for CLI/agents: sites.registry.json
+# Keep both in sync when editing by hand, or only edit the JSON and ignore this file.
+
+# See sites.registry.json

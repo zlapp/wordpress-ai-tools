@@ -1,0 +1,3 @@
+[submodule "sites/lappzvi"]
+	path = sites/lappzvi
+	url = https://github.com/zlapp/lappzvi-wp.git

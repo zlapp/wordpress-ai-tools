@@ -1,0 +1,22 @@
+{
+  "mcpServers": {
+    "wordpress-playground": {
+      "command": "npx",
+      "args": ["-y", "@wp-playground/mcp"]
+    },
+    "wordpress-lappzvi": {
+      "command": "npx",
+      "args": ["-y", "@automattic/mcp-wordpress-remote@latest"],
+      "env": {
+        "WP_API_URL": "https://lappzvi.com/wp-json/mcp/mcp-adapter-default-server",
+        "WP_API_USERNAME": "${LAPPZVI_WP_USER}",
+        "WP_API_PASSWORD": "${LAPPZVI_WP_APP_PASSWORD}",
+        "LOG_FILE": "/tmp/mcp-lappzvi.log"
+      }
+    }
+  },
+  "_comments": {
+    "wordpress-playground": "Local Playground control — always safe for design iteration.",
+    "wordpress-lappzvi": "Optional live-site MCP. Requires mcp-adapter plugin + Business-class hosting. Prefer REST Application Passwords if plugins are unavailable."
+  }
+}

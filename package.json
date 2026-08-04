@@ -1,0 +1,31 @@
+{
+  "name": "wordpress-ai-tools",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Agent-friendly toolkit to edit many WordPress sites (themes, patterns, content) via Claude Code / Codex, Playground, MCP, and WP-CLI.",
+  "type": "module",
+  "bin": {
+    "wp-ai": "./packages/cli/bin/wp-ai.js"
+  },
+  "scripts": {
+    "wp-ai": "node packages/cli/bin/wp-ai.js",
+    "site:list": "node packages/cli/bin/wp-ai.js site list",
+    "site:add": "node packages/cli/bin/wp-ai.js site add",
+    "playground": "node packages/cli/bin/wp-ai.js playground",
+    "skills:install": "node scripts/install-skills.mjs",
+    "skills:list": "npx skills add WordPress/agent-skills --list"
+  },
+  "engines": {
+    "node": ">=20.18"
+  },
+  "keywords": [
+    "wordpress",
+    "ai",
+    "agent",
+    "claude",
+    "codex",
+    "playground",
+    "mcp"
+  ],
+  "license": "GPL-2.0-or-later"
+}
